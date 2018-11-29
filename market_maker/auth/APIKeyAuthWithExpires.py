@@ -20,7 +20,7 @@ class APIKeyAuthWithExpires(AuthBase):
         For more details, see https://www.bitmex.com/app/apiKeys
         """
         # modify and return the request
-        expires = int(round(time.time()) + 5)  # 5s grace period in case of clock skew
+        expires = int(round(time.time()) + 60)  # 60s grace period in case of clock skew
         r.headers['api-expires'] = str(expires)
         r.headers['api-key'] = self.apiKey
         r.headers['api-signature'] = generate_signature(self.apiSecret, r.method, r.url, expires, r.body or '')
