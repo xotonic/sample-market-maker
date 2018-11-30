@@ -8,7 +8,7 @@ import requests
 import atexit
 import signal
 
-from market_maker import bitmex
+from market_maker import bitmex, cryptopia
 from market_maker.settings import settings
 from market_maker.utils import log, constants, errors, math
 
@@ -29,7 +29,7 @@ class ExchangeInterface:
         if len(sys.argv) > 1:
             self.symbol = sys.argv[1]
         else:
-            self.symbol = settings.SYMBOL
+            self.symbol = settings.symbol
         self.bitmex = bitmex.BitMEX(base_url=settings.BASE_URL, symbol=self.symbol,
                                     apiKey=settings.API_KEY, apiSecret=settings.API_SECRET,
                                     orderIDPrefix=settings.ORDERID_PREFIX, postOnly=settings.POST_ONLY,

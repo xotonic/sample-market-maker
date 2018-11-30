@@ -7,21 +7,40 @@ import hmac
 import hashlib
 import base64
 import requests
+import logging
 
-
+from market_maker.utils import log
 from requests.compat import quote_plus
 
-class Cryptopia(object):
+logger = log.setup_custom_logger('root', 'DEBUG')
+
+class CryptopiaAPI(object):
     """ Represents a wrapper for cryptopia API """
 
-    def __init__(self, key, secret):
+    def __init__(self, symbol, key, secret):
+        self.logger = logging.getLogger('root')
         self.key = key
         self.secret = secret
-        self.public = ['GetCurrencies', 'GetTradePairs', 'GetMarkets',
-                       'GetMarket', 'GetMarketHistory', 'GetMarketOrders', 'GetMarketOrderGroups']
-        self.private = ['GetBalance', 'GetDepositAddress', 'GetOpenOrders',
-                        'GetTradeHistory', 'GetTransactions', 'SubmitTrade',
-                        'CancelTrade', 'SubmitTip', 'SubmitWithdraw', 'SubmitTransfer']
+        self.symbol = symbol
+
+        self.public = ['GetCurrencies',
+                       'GetTradePairs',
+                       'GetMarkets',
+                       'GetMarket',
+                       'GetMarketHistory',
+                       'GetMarketOrders',
+                       'GetMarketOrderGroups']
+
+        self.private = ['GetBalance',
+                        'GetDepositAddress',
+                        'GetOpenOrders',
+                        'GetTradeHistory',
+                        'GetTransactions',
+                        'SubmitTrade',
+                        'CancelTrade',
+                        'SubmitTip',
+                        'SubmitWithdraw',
+                        'SubmitTransfer']
 
     def api_query(self, feature_requested, get_parameters=None, post_parameters=None):
         """ Performs a generic api request """
@@ -55,7 +74,7 @@ class Cryptopia(object):
                 except requests.exceptions.RequestException as ex:
                     return None, "Status Code : " + str(ex)
             req = req.json()
-            if 'Success' in req and req['Success'] is True:
+            if 'Success' in req and req['Success'] is True and req['Error'] is None:
                 result = req['Data']
                 error = None
             else:
@@ -180,4 +199,94 @@ class Cryptopia(object):
                                                   hashlib.sha256).digest())
         header_value = "amx " + self.key + ":" + hmacsignature.decode('utf-8') + ":" + nonce
         return {'Authorization': header_value, 'Content-Type': 'application/json; charset=utf-8'}
+
+
+class CryptopiaInterface:
+    def __init__(self, settings, dry_run=False):
+        self.dry_run = dry_run
+        self.settings = settings
+
+        if len(sys.argv) > 1:
+            self.symbol = sys.argv[1]
+        else:
+            self.symbol = settings.symbol
+
+        self.crjptopia = cryptopia.Cryptopia(symbol=self.symbol,
+                apiKey=self.settings.API_KEY, secret=self.settings.API_SECRET)
+
+    def cancel_order(self, order):
+        pass
+
+    def cancel_all_orders(self):
+        pass
+        
+
+    def get_portfolio(self):
+        pass
+        
+
+    def calc_delta(self):
+        pass
+        
+
+    def get_delta(self, symbol=None):
+        pass
+        
+
+    def get_instrument(self, symbol=None):
+        pass
+        
+
+    def get_margin(self):
+        pass
+        
+
+    def get_orders(self):
+        pass
+        
+
+    def get_highest_buy(self):
+        pass
+        
+
+    def get_lowest_sell(self):
+        pass
+        
+
+    def get_position(self, symbol=None):
+        pass
+        
+
+    def get_ticker(self, symbol=None):
+        pass
+        
+
+    def get_ticker(self, symbol=None):
+        pass
+        
+
+    def is_open(self):
+        pass
+        
+
+    def check_market_open(self):
+        pass
+        
+
+    def check_if_orderbook_empty(self):
+        pass
+        
+
+    def amend_bulk_orders(self, orders):
+        pass
+        
+
+    def create_bulk_orders(self, orders):
+        pass
+        
+
+    def cancel_bulk_orders(self, orders):
+        pass
+        
+
 
